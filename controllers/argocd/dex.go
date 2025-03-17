@@ -240,9 +240,6 @@ func (r *ReconcileArgoCD) reconcileDexDeployment(cr *argoproj.ArgoCD) error {
 	AddSeccompProfileForOpenShift(r.Client, &deploy.Spec.Template.Spec)
 
 	dexEnv := proxyEnvVars()
-	if cr.Spec.SSO != nil && cr.Spec.SSO.Dex != nil {
-		dexEnv = append(dexEnv, cr.Spec.SSO.Dex.Env...)
-	}
 
 	dexVolumes := []corev1.Volume{
 		{
@@ -259,10 +256,6 @@ func (r *ReconcileArgoCD) reconcileDexDeployment(cr *argoproj.ArgoCD) error {
 		},
 	}
 
-	if cr.Spec.SSO.Dex.Volumes != nil {
-		dexVolumes = append(dexVolumes, cr.Spec.SSO.Dex.Volumes...)
-	}
-
 	dexVolumeMounts := []corev1.VolumeMount{
 		{
 			Name:      "static-files",
@@ -274,8 +267,16 @@ func (r *ReconcileArgoCD) reconcileDexDeployment(cr *argoproj.ArgoCD) error {
 		},
 	}
 
-	if cr.Spec.SSO.Dex.VolumeMounts != nil {
-		dexVolumeMounts = append(dexVolumeMounts, cr.Spec.SSO.Dex.VolumeMounts...)
+	if cr.Spec.SSO != nil && cr.Spec.SSO.Dex != nil {
+		dexEnv = append(dexEnv, cr.Spec.SSO.Dex.Env...)
+
+		if cr.Spec.SSO.Dex.Volumes != nil {
+			dexVolumes = append(dexVolumes, cr.Spec.SSO.Dex.Volumes...)
+		}
+
+		if cr.Spec.SSO.Dex.VolumeMounts != nil {
+			dexVolumeMounts = append(dexVolumeMounts, cr.Spec.SSO.Dex.VolumeMounts...)
+		}
 	}
 
 	deploy.Spec.Template.Spec.Containers = []corev1.Container{{
