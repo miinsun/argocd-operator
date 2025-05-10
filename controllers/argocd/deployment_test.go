@@ -2,7 +2,6 @@ package argocd
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"reflect"
 	"strings"
@@ -720,6 +719,7 @@ func TestReconcileArgoCD_reconcileDeployments_proxy(t *testing.T) {
 
 	logf.SetLogger(ZapLogger(true))
 	a := makeTestArgoCD(func(a *argoproj.ArgoCD) {
+		//lint:ignore SA1019 known to be deprecated
 		a.Spec.Grafana.Enabled = true
 		a.Spec.SSO = &argoproj.ArgoCDSSOSpec{
 			Provider: argoproj.SSOProviderTypeDex,
@@ -1263,7 +1263,7 @@ func TestReconcileArgoCD_reconcileServerDeployment(t *testing.T) {
 						ValueFrom: &corev1.EnvVarSource{
 							SecretKeyRef: &corev1.SecretKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
-									Name: fmt.Sprintf("argocd-redis-initial-password"),
+									Name: "argocd-redis-initial-password",
 								},
 								Key: "admin.password",
 							},
@@ -1428,12 +1428,12 @@ func TestArgoCDServerDeploymentCommand(t *testing.T) {
 		"https://argocd-dex-server.argocd.svc.cluster.local:5556",
 		"--repo-server",
 		"argocd-repo-server.argocd.svc.cluster.local:8081",
-		"--redis",
-		"foo.scv.cluster.local:6379",
 		"--loglevel",
 		"info",
 		"--logformat",
 		"text",
+		"--redis",
+		"foo.scv.cluster.local:6379",
 	}
 
 	assert.NoError(t, r.reconcileServerDeployment(a, false))
@@ -1708,7 +1708,7 @@ func TestReconcileArgoCD_reconcileServerDeploymentWithInsecure(t *testing.T) {
 						ValueFrom: &corev1.EnvVarSource{
 							SecretKeyRef: &corev1.SecretKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
-									Name: fmt.Sprintf("argocd-redis-initial-password"),
+									Name: "argocd-redis-initial-password",
 								},
 								Key: "admin.password",
 							},
@@ -1816,7 +1816,7 @@ func TestReconcileArgoCD_reconcileServerDeploymentChangedToInsecure(t *testing.T
 						ValueFrom: &corev1.EnvVarSource{
 							SecretKeyRef: &corev1.SecretKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
-									Name: fmt.Sprintf("argocd-redis-initial-password"),
+									Name: "argocd-redis-initial-password",
 								},
 								Key: "admin.password",
 							},
@@ -2516,12 +2516,12 @@ func TestArgoCDRepoServerDeploymentCommand(t *testing.T) {
 	wantCmd := []string{
 		"uid_entrypoint.sh",
 		"argocd-repo-server",
-		"--redis",
-		"foo.scv.cluster.local:6379",
 		"--loglevel",
 		"info",
 		"--logformat",
 		"text",
+		"--redis",
+		"foo.scv.cluster.local:6379",
 	}
 
 	assert.NoError(t, r.reconcileRepoDeployment(a, false))
